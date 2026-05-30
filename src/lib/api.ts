@@ -7,21 +7,48 @@ export async function getInstitution(id: string) {
 }
 
 export async function getInstitutionWorksGrowth(id: string) {
-  // We want to fetch works for the last 10 years grouped by publication year
   const res = await fetch(`${OPENALEX_API_BASE}/works?filter=institutions.id:${id}&group_by=publication_year&mailto=test@example.com`, { next: { revalidate: 3600 } });
   if (!res.ok) throw new Error(`Failed to fetch works growth: ${res.status} ${res.statusText}`);
   return res.json();
 }
 
 export async function getTopResearchers(id: string) {
-  const res = await fetch(`${OPENALEX_API_BASE}/authors?filter=last_known_institutions.id:${id}&sort=cited_by_count:desc&per-page=10&mailto=test@example.com`, { next: { revalidate: 3600 } });
+  const res = await fetch(`${OPENALEX_API_BASE}/authors?filter=last_known_institutions.id:${id}&sort=cited_by_count:desc&per-page=15&mailto=test@example.com`, { next: { revalidate: 3600 } });
   if (!res.ok) throw new Error(`Failed to fetch top researchers: ${res.status} ${res.statusText}`);
   return res.json();
 }
 
 export async function getRecentWorks(id: string) {
-  const res = await fetch(`${OPENALEX_API_BASE}/works?filter=institutions.id:${id}&sort=publication_date:desc&per-page=15&mailto=test@example.com`, { next: { revalidate: 3600 } });
+  const res = await fetch(`${OPENALEX_API_BASE}/works?filter=institutions.id:${id}&sort=cited_by_count:desc&per-page=20&mailto=test@example.com`, { next: { revalidate: 3600 } });
   if (!res.ok) throw new Error(`Failed to fetch recent works: ${res.status} ${res.statusText}`);
+  return res.json();
+}
+
+/** Top journals/sources by publication count */
+export async function getTopSources(id: string) {
+  const res = await fetch(`${OPENALEX_API_BASE}/works?filter=institutions.id:${id}&group_by=primary_location.source.id&per-page=8&mailto=test@example.com`, { next: { revalidate: 3600 } });
+  if (!res.ok) return null;
+  return res.json();
+}
+
+/** Works grouped by document type (article, book-chapter, preprint, etc.) */
+export async function getWorksByType(id: string) {
+  const res = await fetch(`${OPENALEX_API_BASE}/works?filter=institutions.id:${id}&group_by=type&mailto=test@example.com`, { next: { revalidate: 3600 } });
+  if (!res.ok) return null;
+  return res.json();
+}
+
+/** Top collaborating countries by co-authorship */
+export async function getCollaboratingCountries(id: string) {
+  const res = await fetch(`${OPENALEX_API_BASE}/works?filter=institutions.id:${id}&group_by=authorships.countries&per-page=10&mailto=test@example.com`, { next: { revalidate: 3600 } });
+  if (!res.ok) return null;
+  return res.json();
+}
+
+/** Open Access breakdown grouped by OA status */
+export async function getOpenAccessBreakdown(id: string) {
+  const res = await fetch(`${OPENALEX_API_BASE}/works?filter=institutions.id:${id}&group_by=open_access.oa_status&mailto=test@example.com`, { next: { revalidate: 3600 } });
+  if (!res.ok) return null;
   return res.json();
 }
 
@@ -50,14 +77,18 @@ export async function getWikidata(wikidataUrl: string) {
   }
 }
 
-export async function getInstitutionData(id: string = "I24676775") { // Default to IIT Madras
+export async function getInstitutionData(id: string = "I347237974") { // Default to Ashoka University
   const openAlexData = await getInstitution(id);
-  
-  // Parallel fetch for enrichments and metrics
-  const [worksGrowth, topResearchers, recentWorks, rorData, wikidata] = await Promise.all([
+
+  // Parallel fetch for all enrichments and metrics
+  const [worksGrowth, topResearchers, recentWorks, topSources, worksByType, collaboratingCountries, oaBreakdown, rorData, wikidata] = await Promise.all([
     getInstitutionWorksGrowth(id),
     getTopResearchers(id),
     getRecentWorks(id),
+    getTopSources(id),
+    getWorksByType(id),
+    getCollaboratingCountries(id),
+    getOpenAccessBreakdown(id),
     openAlexData.ids?.ror ? getRorData(openAlexData.ids.ror) : Promise.resolve(null),
     openAlexData.ids?.wikidata ? getWikidata(openAlexData.ids.wikidata) : Promise.resolve(null)
   ]);
@@ -67,6 +98,10 @@ export async function getInstitutionData(id: string = "I24676775") { // Default 
     worksGrowth,
     topResearchers,
     recentWorks,
+    topSources,
+    worksByType,
+    collaboratingCountries,
+    oaBreakdown,
     rorData,
     wikidata
   };

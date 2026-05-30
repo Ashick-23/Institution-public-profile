@@ -10,98 +10,169 @@ import {
   Tooltip,
   XAxis,
   YAxis,
-  PieChart,
-  Pie,
-  Cell
+  Cell,
 } from "recharts";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+
+const ACADEMIC_COLORS = [
+  "#1e3a5f",
+  "#2e6da4",
+  "#3a7ebf",
+  "#4f9fd4",
+  "#6eb5e0",
+  "#8ecae6",
+  "#aad5ed",
+];
 
 export function GrowthChart({ data }: { data: any[] }) {
-  // We expect data to be an array of { year, count }
   return (
-    <Card className="col-span-1 lg:col-span-2 bg-white/80 dark:bg-white/5 border border-slate-200/60 dark:border-white/10 backdrop-blur-xl shadow-lg dark:shadow-2xl transition-all duration-300">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-slate-800 dark:text-slate-100 font-bold text-sm tracking-tight">Research Growth</CardTitle>
-        <CardDescription className="text-xs text-slate-500 dark:text-slate-400">Publications output since 2000</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="h-[240px] w-full">
-          <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={data} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
-              <defs>
-                <linearGradient id="colorCount" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="var(--chart-growth-fill)" stopOpacity={0.4} />
-                  <stop offset="95%" stopColor="var(--chart-growth-fill)" stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--chart-grid)" />
-              <XAxis dataKey="year" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: 'var(--chart-text)' }} dy={10} />
-              <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: 'var(--chart-text)' }} />
-              <Tooltip
-                contentStyle={{ backgroundColor: 'var(--tooltip-bg)', borderRadius: '8px', border: '1px solid var(--tooltip-border)', color: 'var(--tooltip-text)', fontSize: '11px' }}
-                itemStyle={{ color: 'var(--chart-growth-stroke)' }}
-              />
-              <Area type="monotone" dataKey="count" stroke="var(--chart-growth-stroke)" strokeWidth={2.5} fillOpacity={1} fill="url(#colorCount)" />
-            </AreaChart>
-          </ResponsiveContainer>
+    <div className="col-span-1 lg:col-span-2">
+      <div className="bg-white border border-slate-200 rounded-sm shadow-sm h-full">
+        <div className="px-5 pt-5 pb-3 border-b border-slate-100">
+          <h3 className="text-sm font-semibold text-slate-800 tracking-tight">Publication Output Trend</h3>
+          <p className="text-xs text-slate-500 mt-0.5">Annual scholarly works indexed since 2000</p>
         </div>
-      </CardContent>
-    </Card>
+        <div className="p-4">
+          <div className="h-[220px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={data} margin={{ top: 8, right: 8, left: -20, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="colorCount" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#2e6da4" stopOpacity={0.15} />
+                    <stop offset="95%" stopColor="#2e6da4" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="2 4" vertical={false} stroke="rgba(30,58,95,0.06)" />
+                <XAxis
+                  dataKey="year"
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fontSize: 10, fill: '#94a3b8' }}
+                  dy={8}
+                  interval={4}
+                />
+                <YAxis
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fontSize: 10, fill: '#94a3b8' }}
+                  width={40}
+                />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: '#fff',
+                    borderRadius: '4px',
+                    border: '1px solid #e2e8f0',
+                    color: '#0f172a',
+                    fontSize: '11px',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                  }}
+                  itemStyle={{ color: '#1e3a5f' }}
+                  labelStyle={{ fontWeight: 600, color: '#334155' }}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="count"
+                  stroke="#1e3a5f"
+                  strokeWidth={2}
+                  fillOpacity={1}
+                  fill="url(#colorCount)"
+                  dot={false}
+                  activeDot={{ r: 4, fill: '#1e3a5f' }}
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 
-export function TopicsChart({ data }: { data: any[] }) {
-  // data: { name, value }
-  const COLORS = [
-    "var(--chart-topics-fill)",
-    "#3b82f6", // Blue
-    "#8b5cf6", // Purple
-    "#ec4899", // Pink
-    "#f59e0b", // Amber
-    "#10b981", // Emerald
-    "#6366f1"  // Indigo
-  ];
+export function TopicsBarChart({ data }: { data: any[] }) {
+  return (
+    <div className="col-span-1">
+      <div className="bg-white border border-slate-200 rounded-sm shadow-sm h-full">
+        <div className="px-5 pt-5 pb-3 border-b border-slate-100">
+          <h3 className="text-sm font-semibold text-slate-800 tracking-tight">Research Strengths</h3>
+          <p className="text-xs text-slate-500 mt-0.5">Top research themes by volume</p>
+        </div>
+        <div className="p-4">
+          <div className="h-[220px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart
+                data={data.slice(0, 6)}
+                layout="vertical"
+                margin={{ top: 0, right: 16, left: 0, bottom: 0 }}
+              >
+                <CartesianGrid strokeDasharray="2 4" horizontal={false} stroke="rgba(30,58,95,0.06)" />
+                <XAxis
+                  type="number"
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fontSize: 10, fill: '#94a3b8' }}
+                />
+                <YAxis
+                  type="category"
+                  dataKey="name"
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fontSize: 9, fill: '#64748b' }}
+                  width={110}
+                  tickFormatter={(v) => v.length > 18 ? v.slice(0, 18) + '…' : v}
+                />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: '#fff',
+                    borderRadius: '4px',
+                    border: '1px solid #e2e8f0',
+                    color: '#0f172a',
+                    fontSize: '11px',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                  }}
+                  cursor={{ fill: 'rgba(30,58,95,0.04)' }}
+                />
+                <Bar dataKey="value" radius={[0, 2, 2, 0]} maxBarSize={14}>
+                  {data.slice(0, 6).map((_: any, index: number) => (
+                    <Cell key={index} fill={ACADEMIC_COLORS[index % ACADEMIC_COLORS.length]} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function WorksTypeChart({ data }: { data: { name: string; value: number }[] }) {
+  const top = data.slice(0, 6);
+  const total = top.reduce((s, d) => s + d.value, 0);
 
   return (
-    <Card className="col-span-1 bg-white/80 dark:bg-white/5 border border-slate-200/60 dark:border-white/10 backdrop-blur-xl shadow-lg dark:shadow-2xl transition-all duration-300 flex flex-col justify-between">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-slate-800 dark:text-slate-100 font-bold text-sm tracking-tight">Research Strengths</CardTitle>
-        <CardDescription className="text-xs text-slate-500 dark:text-slate-400">Primary areas of study</CardDescription>
-      </CardHeader>
-      <CardContent className="flex-1 flex flex-col justify-center pb-4 pt-0">
-        <div className="h-[150px] w-full relative">
-          <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
-              <Tooltip
-                contentStyle={{ backgroundColor: 'var(--tooltip-bg)', borderRadius: '8px', border: '1px solid var(--tooltip-border)', color: 'var(--tooltip-text)', fontSize: '10px' }}
-              />
-              <Pie
-                data={data}
-                cx="50%"
-                cy="50%"
-                innerRadius={40}
-                outerRadius={65}
-                paddingAngle={3}
-                dataKey="value"
-              >
-                {data.map((entry: any, index: number) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Pie>
-            </PieChart>
-          </ResponsiveContainer>
-        </div>
-        
-        {/* Compact custom legend for high-density space layout */}
-        <div className="grid grid-cols-2 gap-x-3 gap-y-1.5 mt-2 w-full text-[10px] text-slate-600 dark:text-slate-400 font-medium">
-          {data.slice(0, 6).map((entry: any, index: number) => (
-            <div key={entry.name} className="flex items-center gap-1.5 min-w-0">
-              <span className="size-2 rounded-full shrink-0" style={{ backgroundColor: COLORS[index % COLORS.length] }}></span>
-              <span className="truncate" title={entry.name}>{entry.name}</span>
+    <div className="bg-white border border-slate-200 rounded-sm shadow-sm">
+      <div className="px-5 pt-5 pb-3 border-b border-slate-100">
+        <h3 className="text-sm font-semibold text-slate-800 tracking-tight">Output by Type</h3>
+        <p className="text-xs text-slate-500 mt-0.5">Breakdown of scholarly document types</p>
+      </div>
+      <div className="p-4 space-y-2.5">
+        {top.map((item, i) => {
+          const pct = total > 0 ? Math.round((item.value / total) * 100) : 0;
+          return (
+            <div key={item.name}>
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-xs capitalize text-slate-600 font-medium">{item.name}</span>
+                <span className="text-xs text-slate-500 tabular-nums">{item.value.toLocaleString()} <span className="text-slate-400">({pct}%)</span></span>
+              </div>
+              <div className="h-1.5 rounded-full bg-slate-100 overflow-hidden">
+                <div
+                  className="h-full rounded-full transition-all duration-500"
+                  style={{ width: `${pct}%`, backgroundColor: ACADEMIC_COLORS[i % ACADEMIC_COLORS.length] }}
+                />
+              </div>
             </div>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
+          );
+        })}
+      </div>
+    </div>
   );
 }
