@@ -88,56 +88,38 @@ export function GrowthChart({ data }: { data: any[] }) {
 }
 
 export function TopicsBarChart({ data }: { data: any[] }) {
+  const top = data.slice(0, 6);
+  const total = top.reduce((s: number, d: any) => s + d.value, 0);
+
   return (
     <div className="col-span-1">
-      <div className="bg-white border border-slate-200 rounded-sm shadow-sm h-full">
-        <div className="px-5 pt-5 pb-3 border-b border-slate-100">
-          <h3 className="text-sm font-semibold text-slate-800 tracking-tight">Research Strengths</h3>
+      <div className="bg-white border border-slate-200 rounded-sm shadow-sm h-full flex flex-col">
+        <div className="px-5 pt-5 pb-3 border-b border-slate-100 shrink-0">
+          <h3 className="text-sm font-semibold text-slate-800 tracking-tight">Discipline Distribution</h3>
           <p className="text-xs text-slate-500 mt-0.5">Top research themes by volume</p>
         </div>
-        <div className="p-4">
-          <div className="h-[220px] w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart
-                data={data.slice(0, 6)}
-                layout="vertical"
-                margin={{ top: 0, right: 16, left: 0, bottom: 0 }}
-              >
-                <CartesianGrid strokeDasharray="2 4" horizontal={false} stroke="rgba(30,58,95,0.06)" />
-                <XAxis
-                  type="number"
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{ fontSize: 10, fill: '#94a3b8' }}
-                />
-                <YAxis
-                  type="category"
-                  dataKey="name"
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{ fontSize: 9, fill: '#64748b' }}
-                  width={110}
-                  tickFormatter={(v) => v.length > 18 ? v.slice(0, 18) + '…' : v}
-                />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: '#fff',
-                    borderRadius: '4px',
-                    border: '1px solid #e2e8f0',
-                    color: '#0f172a',
-                    fontSize: '11px',
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-                  }}
-                  cursor={{ fill: 'rgba(30,58,95,0.04)' }}
-                />
-                <Bar dataKey="value" radius={[0, 2, 2, 0]} maxBarSize={14}>
-                  {data.slice(0, 6).map((_: any, index: number) => (
-                    <Cell key={index} fill={ACADEMIC_COLORS[index % ACADEMIC_COLORS.length]} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
+        <div className="p-4 flex-1 flex flex-col justify-center space-y-3.5">
+          {top.map((item: any, i: number) => {
+            const pct = total > 0 ? Math.round((item.value / total) * 100) : 0;
+            return (
+              <div key={item.name}>
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-[11px] font-semibold text-slate-700 truncate mr-2" title={item.name}>
+                    {item.name}
+                  </span>
+                  <span className="text-[10px] text-slate-500 tabular-nums shrink-0">
+                    {item.value.toLocaleString()} <span className="text-slate-400 font-medium">({pct}%)</span>
+                  </span>
+                </div>
+                <div className="h-1.5 rounded-full bg-slate-100 overflow-hidden">
+                  <div
+                    className="h-full rounded-full transition-all duration-500"
+                    style={{ width: `${pct}%`, backgroundColor: ACADEMIC_COLORS[i % ACADEMIC_COLORS.length] }}
+                  />
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>

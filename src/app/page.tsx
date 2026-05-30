@@ -1,6 +1,9 @@
 import { getInstitutionData } from "@/lib/api";
 import { SearchNav } from "@/components/dashboard/SearchNav";
-import { GrowthChart, TopicsBarChart, WorksTypeChart } from "@/components/dashboard/Charts";
+import { TopicsBarChart, WorksTypeChart } from "@/components/dashboard/Charts";
+import { CountsYearChart } from "@/components/dashboard/CountsYearChart";
+import { PublicationsTable } from "@/components/dashboard/PublicationsTable";
+import { SDGGrid } from "@/components/dashboard/SDGGrid";
 import {
   Building2, BookOpen, Quote, Users, MapPin, ExternalLink,
   Calendar, TrendingUp, Globe, Unlock, Award, FileText,
@@ -26,6 +29,11 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ [
   const growthData = worksGrowth?.group_by?.map((g: any) => ({ year: g.key, count: g.count }))
     .sort((a: any, b: any) => a.year.localeCompare(b.year))
     .filter((g: any) => parseInt(g.year) >= 2000) || [];
+
+  // --- Counts by year (Publications & Citations) ---
+  const countsByYearData = openAlexData.counts_by_year
+    ?.filter((y: any) => y.year >= 2000)
+    .sort((a: any, b: any) => a.year - b.year) || [];
 
   // --- Topics data ---
   const topicsData = openAlexData?.topics?.slice(0, 7).map((c: any) => ({ name: c.display_name, value: c.count })) || [];
@@ -65,7 +73,6 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ [
   if (openAlexData.homepage_url) {
     try {
       domain = new URL(openAlexData.homepage_url).hostname;
-      if (!logo) logo = `https://logo.clearbit.com/${domain}`;
     } catch (e) {
       // ignore invalid URLs
     }
@@ -202,12 +209,13 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ [
             <h2 className="text-xs font-semibold tracking-[0.15em] uppercase text-slate-400">Core Research Metrics</h2>
             <div className="flex-1 h-px bg-slate-200" />
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
             {[
               { label: "Publications", value: fNum(worksCount), icon: BookOpen, sub: "total indexed works" },
               { label: "Citations", value: fNum(citedCount), icon: Quote, sub: "total times cited" },
               { label: "h-Index", value: hIndex, icon: TrendingUp, sub: "Hirsch index" },
               { label: "i10-Index", value: fNum(i10Index), icon: Award, sub: "≥10 citations" },
+              { label: "2yr Citedness", value: twoYrMeanCitedness?.toFixed(1) || "0", icon: BarChart2, sub: "mean citations" },
               { label: "Open Access", value: `${oaRatio}%`, icon: Unlock, sub: "of recent works" },
               { label: "Int'l Partners", value: partnerCountries.length, icon: Globe, sub: "collaborating countries" },
             ].map((stat) => (
@@ -245,10 +253,43 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ [
             <div className="flex-1 h-px bg-slate-200" />
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-            <GrowthChart data={growthData} />
+            <CountsYearChart data={countsByYearData} />
             <TopicsBarChart data={topicsData} />
           </div>
         </section>
+
+        {/* ── Annual Stats Table ── */}
+        {countsByYearData.length > 0 && (
+          <section>
+            <div className="bg-white border border-slate-200 rounded-sm shadow-sm">
+              <div className="px-5 py-3 border-b border-slate-100">
+                <h3 className="text-sm font-semibold text-slate-800 tracking-tight">Annual Output Summary</h3>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs text-slate-600">
+                  <thead className="bg-slate-50 border-b border-slate-100 text-slate-500 uppercase tracking-wider">
+                    <tr>
+                      <th className="px-5 py-2.5 font-semibold">Year</th>
+                      <th className="px-5 py-2.5 font-semibold text-right">Publications</th>
+                      <th className="px-5 py-2.5 font-semibold text-right">Citations</th>
+                      <th className="px-5 py-2.5 font-semibold text-right">OA Works</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {[...countsByYearData].reverse().slice(0, 10).map((row: any) => (
+                      <tr key={row.year} className="hover:bg-slate-50/50 transition-colors">
+                        <td className="px-5 py-2 font-medium text-slate-800">{row.year}</td>
+                        <td className="px-5 py-2 text-right tabular-nums">{row.works_count.toLocaleString()}</td>
+                        <td className="px-5 py-2 text-right tabular-nums">{row.cited_by_count.toLocaleString()}</td>
+                        <td className="px-5 py-2 text-right tabular-nums">{row.oa_works_count.toLocaleString()}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+        )}
 
         {/* ── Works Type + OA Breakdown ── */}
         <section>
@@ -337,30 +378,37 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ [
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
 
             {/* Top Researchers */}
-            <div className="bg-white border border-slate-200 rounded-sm shadow-sm flex flex-col" style={{ maxHeight: '420px' }}>
-              <div className="px-5 pt-5 pb-3 border-b border-slate-100 flex items-center justify-between shrink-0">
+            <div className="bg-white border border-slate-200 rounded-sm shadow-sm flex flex-col" style={{ maxHeight: '600px' }}>
+              <div className="px-5 pt-5 pb-3 border-b border-slate-100 flex items-center justify-between shrink-0 bg-slate-50/50">
                 <div>
                   <h3 className="text-sm font-semibold text-slate-800 tracking-tight">Most-Cited Authors</h3>
                   <p className="text-xs text-slate-500 mt-0.5">Researchers currently or recently affiliated</p>
                 </div>
-                <Users className="size-4 text-slate-300" />
+                <Users className="size-4 text-slate-400" />
               </div>
               <div className="flex-1 overflow-y-auto custom-scrollbar divide-y divide-slate-100">
                 {topResearchers?.results?.map((author: any, i: number) => (
-                  <div key={author.id} className="flex items-center gap-3 px-5 py-3 hover:bg-slate-50 transition-colors">
-                    <span className="text-[10px] text-slate-400 w-4 tabular-nums font-medium">{i + 1}</span>
+                  <div key={author.id} className="flex items-start gap-3 px-5 py-4 hover:bg-slate-50/80 transition-colors">
+                    <span className="text-xs text-slate-400 w-4 tabular-nums font-semibold shrink-0 mt-0.5">{i + 1}</span>
                     <div className="flex-1 min-w-0">
                       <a href={`https://openalex.org/${author.id.split('/').pop()}`} target="_blank" rel="noreferrer"
-                        className="text-xs font-semibold text-slate-700 hover:text-slate-900 hover:underline transition-colors">
+                        className="text-sm font-semibold text-slate-800 hover:text-blue-700 hover:underline transition-colors">
                         {author.display_name}
                       </a>
-                      <div className="text-[10px] text-slate-400 mt-0.5 truncate">
-                        {author.x_concepts?.[0]?.display_name || author.topics?.[0]?.display_name || 'Research'}
+                      <div className="mt-1.5 flex flex-wrap gap-1.5">
+                        {author.topics?.slice(0, 3).map((t: any) => (
+                          <span key={t.id} className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-medium bg-slate-100 text-slate-600 truncate max-w-[140px]" title={t.display_name}>
+                            {t.display_name}
+                          </span>
+                        ))}
                       </div>
                     </div>
-                    <div className="text-right shrink-0">
-                      <div className="text-xs font-semibold text-slate-700 tabular-nums">{fNum(author.cited_by_count)}</div>
-                      <div className="text-[10px] text-slate-400">h={author.summary_stats?.h_index}</div>
+                    <div className="text-right shrink-0 flex flex-col items-end gap-1">
+                      <div className="bg-slate-100 border border-slate-200 px-2 py-1 rounded text-center min-w-[50px]">
+                        <div className="text-sm font-bold text-slate-700 tabular-nums leading-none">{fNum(author.cited_by_count)}</div>
+                        <div className="text-[8px] font-semibold uppercase tracking-wider text-slate-500 mt-1">Cit.</div>
+                      </div>
+                      <div className="text-[9px] font-semibold text-slate-500">h-index: <span className="text-slate-700">{author.summary_stats?.h_index}</span></div>
                     </div>
                   </div>
                 ))}
@@ -368,36 +416,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ [
             </div>
 
             {/* High-Impact Works */}
-            <div className="bg-white border border-slate-200 rounded-sm shadow-sm flex flex-col" style={{ maxHeight: '420px' }}>
-              <div className="px-5 pt-5 pb-3 border-b border-slate-100 flex items-center justify-between shrink-0">
-                <div>
-                  <h3 className="text-sm font-semibold text-slate-800 tracking-tight">High-Impact Works</h3>
-                  <p className="text-xs text-slate-500 mt-0.5">Most-cited publications from this institution</p>
-                </div>
-                <FileText className="size-4 text-slate-300" />
-              </div>
-              <div className="flex-1 overflow-y-auto custom-scrollbar divide-y divide-slate-100">
-                {recentWorks?.results?.map((work: any) => (
-                  <div key={work.id} className="px-5 py-3 hover:bg-slate-50 transition-colors">
-                    <a href={work.doi || `https://openalex.org/${work.id.split('/').pop()}`} target="_blank" rel="noreferrer"
-                      className="text-xs font-medium text-slate-700 hover:text-slate-900 hover:underline leading-snug line-clamp-2 transition-colors">
-                      {work.title}
-                    </a>
-                    <div className="flex items-center gap-3 mt-1.5 text-[10px] text-slate-400">
-                      <span className="tabular-nums">{work.publication_year}</span>
-                      <span>·</span>
-                      <span className="truncate flex-1 font-medium">{work.primary_location?.source?.display_name || "—"}</span>
-                      <span className="shrink-0 tabular-nums font-semibold text-slate-600">{fNum(work.cited_by_count)} cit.</span>
-                    </div>
-                    {work.open_access?.is_oa && (
-                      <span className="mt-1.5 inline-flex items-center gap-1 text-[9px] font-semibold uppercase tracking-wider text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded">
-                        <Unlock className="size-2.5" /> Open Access
-                      </span>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
+            <PublicationsTable works={recentWorks?.results || []} />
           </div>
         </section>
 
@@ -421,7 +440,8 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ [
                   return (
                     <div key={country.code} className="flex items-center gap-4 px-5 py-3 hover:bg-slate-50 transition-colors group">
                       <span className="text-[10px] text-slate-400 w-5 tabular-nums font-medium shrink-0">{i + 1}</span>
-                      <span className="text-xs font-medium text-slate-700 w-36 shrink-0 truncate group-hover:text-slate-900 transition-colors">
+                      <span className="text-xs font-medium text-slate-700 w-36 shrink-0 truncate group-hover:text-slate-900 transition-colors flex items-center gap-2">
+                        <span className="text-sm leading-none">{country.code && country.code.length === 2 ? String.fromCodePoint(...[...country.code.toUpperCase()].map(c => 127397 + c.charCodeAt(0))) : ''}</span>
                         {country.name}
                       </span>
                       <div className="flex-1 h-1.5 rounded-full bg-slate-100 overflow-hidden">
@@ -443,28 +463,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ [
         )}
 
         {/* ── SDG Impact ── */}
-        {sdgs.length > 0 && (
-          <section>
-            <div className="flex items-center gap-2 mb-3">
-              <h2 className="text-xs font-semibold tracking-[0.15em] uppercase text-slate-400">UN Sustainable Development Goals</h2>
-              <div className="flex-1 h-px bg-slate-200" />
-              <span className="text-[10px] text-slate-400">Based on recent publications</span>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-              {sdgs.map((sdg) => (
-                <div key={sdg.id} className="bg-white border border-slate-200 rounded-sm shadow-sm flex items-start gap-4 p-4 hover:border-slate-300 transition-colors">
-                  <div className="size-9 rounded bg-slate-800 text-white flex items-center justify-center font-bold text-sm shrink-0">
-                    {sdg.id}
-                  </div>
-                  <div className="min-w-0">
-                    <h4 className="text-xs font-semibold text-slate-700 line-clamp-1">{sdg.name}</h4>
-                    <p className="text-[10px] text-slate-500 mt-0.5"><strong className="text-slate-700">{sdg.count}</strong> aligned publications</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
+        <SDGGrid sdgs={sdgs} />
 
         {/* ── Associated Institutions ── */}
         {openAlexData.associated_institutions?.length > 0 && (
@@ -499,13 +498,6 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ [
 
         {/* ── Footer ── */}
         <footer className="pt-6 border-t border-slate-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-[10px] text-slate-400">
-          <div>
-            <span className="font-semibold text-slate-500">Research Intelligence Platform</span>
-            {' · '}Data sourced from{' '}
-            <a href="https://openalex.org" target="_blank" rel="noreferrer" className="underline hover:text-slate-600">OpenAlex</a>,{' '}
-            <a href="https://ror.org" target="_blank" rel="noreferrer" className="underline hover:text-slate-600">ROR</a>,{' '}
-            <a href="https://www.wikidata.org" target="_blank" rel="noreferrer" className="underline hover:text-slate-600">Wikidata</a>
-          </div>
           <span>CC0 · Open Data</span>
         </footer>
 
