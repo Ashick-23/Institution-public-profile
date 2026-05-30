@@ -68,7 +68,15 @@ export async function getWikidata(wikidataUrl: string) {
   if (!wikidataUrl) return null;
   try {
     const wikidataId = wikidataUrl.split('/').pop();
-    const res = await fetch(`https://www.wikidata.org/w/api.php?action=wbgetentities&ids=${wikidataId}&format=json&props=descriptions|aliases|claims&origin=*`, { next: { revalidate: 86400 } });
+    const res = await fetch(
+      `https://www.wikidata.org/w/api.php?action=wbgetentities&ids=${wikidataId}&format=json&props=descriptions|claims&origin=*`,
+      {
+        headers: {
+          "User-Agent": "ResearchIntelligenceDashboard/1.0 (mailto:test@example.com)"
+        },
+        next: { revalidate: 86400 }
+      }
+    );
     if (!res.ok) return null;
     const data = await res.json();
     return data.entities[wikidataId as string];
