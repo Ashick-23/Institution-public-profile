@@ -88,8 +88,8 @@ export function CountsYearChart({ data }: { data: any[] }) {
                   }}
                   itemStyle={{ fontWeight: 500 }}
                   labelStyle={{ fontWeight: 600, color: '#334155', marginBottom: '4px' }}
-                  formatter={(value: number, name: string) => [
-                    value.toLocaleString(), 
+                  formatter={(value: any, name: any) => [
+                    Number(value).toLocaleString(), 
                     name === 'works_count' ? 'Publications' : 'Citations'
                   ]}
                 />
