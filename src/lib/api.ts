@@ -114,3 +114,32 @@ export async function getInstitutionData(id: string = "I347237974") { // Default
     wikidata
   };
 }
+
+/** Full author profile + their works */
+export async function getAuthorData(id: string) {
+  const [author, works] = await Promise.all([
+    fetch(`${OPENALEX_API_BASE}/authors/${id}?mailto=test@example.com`, { next: { revalidate: 3600 } })
+      .then(r => r.ok ? r.json() : null),
+    fetch(`${OPENALEX_API_BASE}/works?filter=author.id:${id}&sort=cited_by_count:desc&per-page=25&mailto=test@example.com`, { next: { revalidate: 3600 } })
+      .then(r => r.ok ? r.json() : null),
+  ]);
+  return { author, works };
+}
+
+/** Full work detail + related works via shared concepts */
+export async function getWorkData(id: string) {
+  const work = await fetch(`${OPENALEX_API_BASE}/works/${id}?mailto=test@example.com`, { next: { revalidate: 3600 } })
+    .then(r => r.ok ? r.json() : null);
+
+  if (!work) return { work: null, relatedWorks: [] };
+
+  // Find related works via the top concept
+  const topConceptId = work.concepts?.[0]?.id?.split('/').pop();
+  const relatedWorks = topConceptId
+    ? await fetch(`${OPENALEX_API_BASE}/works?filter=concepts.id:${topConceptId}&sort=cited_by_count:desc&per-page=6&mailto=test@example.com`, { next: { revalidate: 3600 } })
+        .then(r => r.ok ? r.json() : null)
+    : null;
+
+  return { work, relatedWorks };
+}
+

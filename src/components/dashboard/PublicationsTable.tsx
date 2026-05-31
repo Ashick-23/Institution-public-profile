@@ -1,6 +1,7 @@
 "use client";
 
-import { FileText, Unlock, BookOpen } from "lucide-react";
+import { FileText, Unlock } from "lucide-react";
+import Link from "next/link";
 
 export function PublicationsTable({ works }: { works: any[] }) {
   if (!works || works.length === 0) return null;
@@ -59,14 +60,12 @@ export function PublicationsTable({ works }: { works: any[] }) {
             <div key={work.id} className="px-5 py-4 hover:bg-slate-50/80 transition-colors group">
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1 min-w-0">
-                  <a 
-                    href={work.doi || `https://openalex.org/${work.id.split('/').pop()}`} 
-                    target="_blank" 
-                    rel="noreferrer"
-                    className="text-sm font-semibold text-slate-800 hover:text-blue-700 hover:underline leading-snug transition-colors line-clamp-2"
+                  <Link 
+                    href={`/works/${work.id?.split('/').pop()}`}
+                    className="text-sm font-semibold text-slate-800 hover:text-primary hover:underline leading-snug transition-colors line-clamp-2"
                   >
                     {work.title}
-                  </a>
+                  </Link>
                   
                   {authorStr && (
                     <div className="mt-1 text-[11px] text-slate-600 font-medium">
