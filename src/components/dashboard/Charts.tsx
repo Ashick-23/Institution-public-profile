@@ -29,7 +29,7 @@ export function GrowthChart({ data }: { data: any[] }) {
     <div className="col-span-1 lg:col-span-2">
       <div className="bg-white border border-slate-200 rounded-sm shadow-sm h-full">
         <div className="px-5 pt-5 pb-3 border-b border-slate-100">
-          <h3 className="text-sm font-semibold text-slate-800 tracking-tight">Publication Output Trend</h3>
+          <h3 className="text-lg font-bold text-slate-800 tracking-tight" style={{ fontFamily: "Georgia, serif" }}>Publication Output Trend</h3>
           <p className="text-xs text-slate-500 mt-0.5">Annual scholarly works indexed since 2000</p>
         </div>
         <div className="p-4">
@@ -96,8 +96,10 @@ export function TopicsBarChart({ data }: { data: any[] }) {
     <div className="col-span-1">
       <div className="bg-white border border-slate-200 rounded-sm shadow-sm h-full flex flex-col">
         <div className="px-5 pt-5 pb-3 border-b border-slate-100 shrink-0">
-          <h3 className="text-sm font-semibold text-slate-800 tracking-tight">Discipline Distribution</h3>
-          <p className="text-xs text-slate-500 mt-0.5">Top research themes by volume</p>
+          <h3 className="text-lg font-bold text-slate-800 tracking-tight" style={{ fontFamily: "Georgia, serif" }}>Domain Influence Taxonomy</h3>
+          <p className="text-xs text-slate-500 mt-2 leading-relaxed" style={{ fontFamily: "'Open Sans', sans-serif" }}>
+            "We do not force our academic operations inside legacy, dry administrative silos. Our campus is powered by a live, organic network of interdisciplinary mind clusters actively dominating fields from Computational Sociology to Quantum Cryptography."
+          </p>
         </div>
         <div className="p-4 flex-1 flex flex-col justify-center space-y-3.5">
           {top.map((item: any, i: number) => {
@@ -134,7 +136,7 @@ export function WorksTypeChart({ data }: { data: { name: string; value: number }
   return (
     <div className="bg-white border border-slate-200 rounded-sm shadow-sm">
       <div className="px-5 pt-5 pb-3 border-b border-slate-100">
-        <h3 className="text-sm font-semibold text-slate-800 tracking-tight">Output by Type</h3>
+        <h3 className="text-lg font-bold text-slate-800 tracking-tight" style={{ fontFamily: "Georgia, serif" }}>Output by Type</h3>
         <p className="text-xs text-slate-500 mt-0.5">Breakdown of scholarly document types</p>
       </div>
       <div className="p-4 space-y-2.5">
@@ -159,3 +161,43 @@ export function WorksTypeChart({ data }: { data: { name: string; value: number }
     </div>
   );
 }
+
+export function QuartileChart() {
+  // Mock data for Quartile Distribution since OpenAlex doesn't provide Scimago quartiles natively
+  const data = [
+    { name: "Q1 (Top 25%)", value: 45 },
+    { name: "Q2 (25% - 50%)", value: 30 },
+    { name: "Q3 (50% - 75%)", value: 15 },
+    { name: "Q4 (Bottom 25%)", value: 10 },
+  ];
+  const total = 100;
+
+  return (
+    <div className="bg-white border border-slate-200 rounded-sm shadow-sm">
+      <div className="px-5 pt-5 pb-3 border-b border-slate-100">
+        <h3 className="text-lg font-bold text-slate-800 tracking-tight" style={{ fontFamily: "Georgia, serif" }}>Quartile Distribution</h3>
+        <p className="text-xs text-slate-500 mt-0.5">Estimated journal quartiles based on impact</p>
+      </div>
+      <div className="p-4 space-y-2.5">
+        {data.map((item, i) => {
+          const pct = item.value;
+          return (
+            <div key={item.name}>
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-xs capitalize text-slate-600 font-medium">{item.name}</span>
+                <span className="text-xs text-slate-500 tabular-nums">{item.value}%</span>
+              </div>
+              <div className="h-1.5 rounded-full bg-slate-100 overflow-hidden">
+                <div
+                  className="h-full rounded-full transition-all duration-500"
+                  style={{ width: `${pct}%`, backgroundColor: ACADEMIC_COLORS[i % ACADEMIC_COLORS.length] }}
+                />
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
