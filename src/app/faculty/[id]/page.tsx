@@ -320,9 +320,8 @@ export default async function FacultyPage({
         )}
 
         {/* ── Footer ── */}
-        <footer className="pt-4 border-t border-slate-200 text-[10px] text-slate-400 flex items-center justify-between">
+        <footer className="pt-4 border-t border-slate-200 text-[10px] text-slate-400 flex items-center justify-center">
           <span>Data sourced from <a href="https://openalex.org" target="_blank" rel="noreferrer" className="underline hover:text-slate-600">OpenAlex</a> · CC0</span>
-          <Link href="/" className="hover:text-slate-600 transition-colors">← Back to Institution</Link>
         </footer>
 
       </main>
