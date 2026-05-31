@@ -7,7 +7,7 @@ import {
   Calendar, TrendingUp, Globe, Unlock, Award, FileText,
   BarChart2, Link2, Loader2, ArrowUpDown, ChevronRight
 } from "lucide-react";
-import { TopicsBarChart, WorksTypeChart } from "@/components/dashboard/Charts";
+import { TopicsBarChart, WorksTypeChart, QuartileChart } from "@/components/dashboard/Charts";
 import { CountsYearChart } from "@/components/dashboard/CountsYearChart";
 import { PublicationsTable } from "@/components/dashboard/PublicationsTable";
 import { SDGGrid } from "@/components/dashboard/SDGGrid";
@@ -67,7 +67,7 @@ export function DashboardClient({
   totalOA,
 }: DashboardClientProps) {
   const [activeTab, setActiveTab] = useState<"analytics" | "insights" | "partnerships" | "faculty" | "publications">("analytics");
-  const [insightsView, setInsightsView] = useState<"overview" | "faculty" | "publications">("overview");
+  const [insightsView, setInsightsView] = useState<"overview" | "faculty" | "publications" | "organogram">("overview");
 
   // --- Faculty list client-side state ---
   const [facultyData, setFacultyData] = useState<any>(null);
@@ -81,6 +81,7 @@ export function DashboardClient({
   const [pubType, setPubType] = useState("");
   const [pubOA, setPubOA] = useState("");
   const [workTypes, setWorkTypes] = useState<any[]>([]);
+  const [showNetworkMap, setShowNetworkMap] = useState(false);
 
   const getCountryName = (code: string | undefined) => {
     if (!code) return "Unknown";
@@ -182,16 +183,19 @@ export function DashboardClient({
   return (
     <div className="space-y-8">
       {/* ── Premium Institution Header ── */}
-      <section className="bg-white border border-slate-200 rounded-sm shadow-sm p-6 md:p-8">
-        <div className="flex flex-col md:flex-row gap-6 items-start">
+      <section className="relative overflow-hidden rounded-sm shadow-sm" style={{ backgroundColor: "#0d3862" }}>
+        {/* Ashoka Red accent bar at the top */}
+        <div className="absolute top-0 left-0 w-full h-1.5" style={{ backgroundColor: "#c4122f" }}></div>
+        
+        <div className="p-6 md:p-8 flex flex-col md:flex-row gap-6 items-start mt-1">
           {/* Logo or SVG Crest Fallback */}
-          <div className="size-20 md:size-24 flex-shrink-0 bg-white border border-slate-200 rounded shadow-sm p-2.5 flex items-center justify-center">
+          <div className="size-20 md:size-24 flex-shrink-0 bg-white border border-white/20 rounded shadow-sm p-2.5 flex items-center justify-center">
             <InstitutionLogo
               src={logo}
               domain={domain}
               alt={institutionName}
               fallback={
-                <svg viewBox="0 0 100 100" className="size-12 text-slate-300" style={{ display: 'block', height: '100%' }}>
+                <svg viewBox="0 0 100 100" className="size-12 text-[#0d3862]" style={{ display: 'block', height: '100%' }}>
                   <path d="M50,10 C70,10 85,20 85,45 C85,70 65,85 50,90 C35,85 15,70 15,45 C15,20 30,10 50,10 Z" fill="none" stroke="currentColor" strokeWidth="4"></path>
                   <path d="M50,15 L50,85 M20,45 L80,45" stroke="currentColor" strokeWidth="2" opacity="0.3"></path>
                   <polygon points="50,25 60,40 40,40" fill="currentColor"></polygon>
@@ -204,29 +208,33 @@ export function DashboardClient({
           {/* Info */}
           <div className="flex-1 space-y-3">
             <div>
-              <p className="text-[11px] font-semibold tracking-[0.15em] uppercase text-slate-400 mb-1">Institution Research Profile</p>
-              <h1 className="text-2xl md:text-3xl font-bold text-slate-900 leading-tight" style={{ fontFamily: "Georgia, serif" }}>
+              <p className="text-[11px] font-semibold tracking-[0.15em] uppercase mb-1" style={{ color: "#6db3d9" }}>
+                Institution Research Profile
+              </p>
+              <h1 className="text-2xl md:text-3xl font-bold text-white leading-tight" style={{ fontFamily: "Georgia, serif" }}>
                 {institutionName}
               </h1>
-              <p className="text-sm text-slate-600 mt-2 leading-relaxed max-w-3xl">{description}</p>
+              <p className="text-sm text-slate-200 mt-2 leading-relaxed max-w-3xl" style={{ fontFamily: "'Open Sans', sans-serif" }}>
+                {description}
+              </p>
             </div>
 
             {/* Meta badges */}
             <div className="flex flex-wrap items-center gap-2 text-xs">
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-slate-100 text-slate-600 border-slate-200">
-                <MapPin className="size-3 text-slate-400" />
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-white/10 text-white border border-white/20">
+                <MapPin className="size-3 text-slate-300" />
                 {openAlexData.geo?.city && `${openAlexData.geo.city}, `}
                 {openAlexData.geo?.region && `${openAlexData.geo.region}, `}
                 {getCountryName(openAlexData.geo?.country_code)}
               </span>
               {foundingYear && (
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-slate-100 text-slate-600 border-slate-200">
-                  <Calendar className="size-3 text-slate-400" /> Est. {foundingYear}
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-white/10 text-white border border-white/20">
+                  <Calendar className="size-3 text-slate-300" /> Est. {foundingYear}
                 </span>
               )}
               {openAlexData.type && (
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-slate-100 text-slate-600 border-slate-200 capitalize">
-                  <Building2 className="size-3 text-slate-400" /> {openAlexData.type}
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-white/10 text-white border border-white/20 capitalize">
+                  <Building2 className="size-3 text-slate-300" /> {openAlexData.type}
                 </span>
               )}
             </div>
@@ -235,19 +243,19 @@ export function DashboardClient({
             <div className="flex flex-wrap items-center gap-3 pt-1">
               {openAlexData.homepage_url && (
                 <a href={openAlexData.homepage_url} target="_blank" rel="noreferrer"
-                  className="inline-flex items-center gap-1.5 text-xs text-primary hover:text-primary/80 transition-colors underline underline-offset-2">
+                  className="inline-flex items-center gap-1.5 text-xs text-white hover:text-[#6db3d9] transition-colors underline underline-offset-2">
                   <Globe className="size-3" /> Official Website
                 </a>
               )}
               {openAlexData.ids?.ror && (
                 <a href={openAlexData.ids.ror} target="_blank" rel="noreferrer"
-                  className="inline-flex items-center gap-1.5 text-xs text-primary hover:text-primary/80 transition-colors underline underline-offset-2">
+                  className="inline-flex items-center gap-1.5 text-xs text-white hover:text-[#6db3d9] transition-colors underline underline-offset-2">
                   <Link2 className="size-3" /> ROR Registry
                 </a>
               )}
               {openAlexData.ids?.wikipedia && (
                 <a href={openAlexData.ids.wikipedia} target="_blank" rel="noreferrer"
-                  className="inline-flex items-center gap-1.5 text-xs text-primary hover:text-primary/80 transition-colors underline underline-offset-2">
+                  className="inline-flex items-center gap-1.5 text-xs text-white hover:text-[#6db3d9] transition-colors underline underline-offset-2">
                   <ExternalLink className="size-3" /> Wikipedia
                 </a>
               )}
@@ -290,7 +298,7 @@ export function DashboardClient({
           {[
             { id: "analytics", label: "Analytics Overview" },
             { id: "insights", label: "Research Insights" },
-            { id: "partnerships", label: "Partnerships" },
+            { id: "partnerships", label: "Global Partnerships" },
           ].map((tab) => (
             <div key={tab.id} className="flex items-center gap-3.5 pb-3 -mb-px">
               <button
@@ -326,7 +334,7 @@ export function DashboardClient({
                         : "text-slate-400 border-transparent hover:text-slate-600"
                     }`}
                   >
-                    All Faculty
+                    Faculty Scholars
                   </button>
                   <span className="text-slate-300 font-light">•</span>
                   <button
@@ -344,7 +352,22 @@ export function DashboardClient({
                         : "text-slate-400 border-transparent hover:text-slate-600"
                     }`}
                   >
-                    All Publications
+                    Scholarly Contributions
+                  </button>
+                  <span className="text-slate-300 font-light">•</span>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setActiveTab("insights");
+                      setInsightsView("organogram");
+                    }}
+                    className={`text-sm font-bold tracking-tight transition-all duration-200 border-b-2 cursor-pointer pb-0.5 -mb-[14px] ${
+                      activeTab === "insights" && insightsView === "organogram"
+                        ? "text-slate-900 border-primary"
+                        : "text-slate-400 border-transparent hover:text-slate-600"
+                    }`}
+                  >
+                    Academic Hierarchy Organogram
                   </button>
                 </div>
               )}
@@ -357,10 +380,10 @@ export function DashboardClient({
       <div className="space-y-8">
         {activeTab === "analytics" && (
           <>
-            {/* ── Output Analysis ── */}
+            {/* ── Research Publications Trend ── */}
             <section className="space-y-3">
               <div className="flex items-center gap-2">
-                <h2 className="text-xs font-semibold tracking-[0.15em] uppercase text-slate-400">Output Analysis</h2>
+                <h2 className="text-xs font-semibold tracking-[0.15em] uppercase text-slate-400">Research Publications Trend</h2>
                 <div className="flex-1 h-px bg-slate-200" />
               </div>
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
@@ -402,14 +425,15 @@ export function DashboardClient({
               </section>
             )}
 
-            {/* ── Works Type + OA Breakdown ── */}
+            {/* ── Article Type & Quartile Distribution ── */}
             <section className="space-y-3">
               <div className="flex items-center gap-2">
-                <h2 className="text-xs font-semibold tracking-[0.15em] uppercase text-slate-400">Publication Profile</h2>
+                <h2 className="text-xs font-semibold tracking-[0.15em] uppercase text-slate-400">Article Type Distribution</h2>
                 <div className="flex-1 h-px bg-slate-200" />
               </div>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 <WorksTypeChart data={worksTypeData} />
+                <QuartileChart />
 
                 {/* Open Access breakdown */}
                 <div className="bg-white border border-slate-200 rounded-sm shadow-sm">
@@ -451,7 +475,6 @@ export function DashboardClient({
                 <div className="flex items-center gap-2">
                   <h2 className="text-xs font-semibold tracking-[0.15em] uppercase text-slate-400">Top Publication Venues</h2>
                   <div className="flex-1 h-px bg-slate-200" />
-                  <span className="text-[10px] text-slate-400">Source: OpenAlex</span>
                 </div>
                 <div className="bg-white border border-slate-200 rounded-sm shadow-sm">
                   <div className="px-5 pt-4 pb-2 border-b border-slate-100">
@@ -478,7 +501,76 @@ export function DashboardClient({
                 </div>
               </section>
             )}
+
+            {/* ── SDG Impact ── */}
+            <SDGGrid sdgs={sdgs} />
           </>
+        )}
+
+        {activeTab === "partnerships" && (
+          <div className="space-y-8">
+            {/* ── International Collaborations ── */}
+            {partnerCountries.length > 0 && (
+              <section className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <h2 className="text-xs font-semibold tracking-[0.15em] uppercase text-slate-400">International Collaborations</h2>
+                  <div className="flex-1 h-px bg-slate-200" />
+                </div>
+                <div className="bg-white border border-slate-200 rounded-sm shadow-sm">
+                  <div className="px-5 pt-4 pb-3 border-b border-slate-100 flex items-center justify-between">
+                    <p className="text-xs text-slate-500">Countries with co-authored publications, ranked by volume</p>
+                    <span className="text-[10px] font-semibold text-slate-400 bg-slate-100 px-2 py-0.5 rounded">{partnerCountries.length} countries</span>
+                  </div>
+                  <div className="divide-y divide-slate-100">
+                    {partnerCountries.map((country: any, i: number) => {
+                      const maxCount = partnerCountries[0]?.count || 1;
+                      const pct = Math.round((country.count / maxCount) * 100);
+                      return (
+                        <div key={country.code} className="flex items-center gap-4 px-5 py-3 hover:bg-slate-50 transition-colors group">
+                          <span className="text-[10px] text-slate-400 w-5 tabular-nums font-medium shrink-0">{i + 1}</span>
+                          <span className="text-xs font-medium text-slate-700 w-36 shrink-0 truncate group-hover:text-slate-900 transition-colors flex items-center gap-2">
+                            <span className="text-sm leading-none">{country.code && country.code.length === 2 ? String.fromCodePoint(...[...country.code.toUpperCase()].map(c => 127397 + c.charCodeAt(0))) : ''}</span>
+                            {country.name}
+                          </span>
+                          <div className="flex-1 h-1.5 rounded-full bg-slate-100 overflow-hidden">
+                            <div
+                              className="h-full rounded-full bg-primary transition-all duration-300"
+                              style={{ width: `${pct}%` }}
+                            />
+                          </div>
+                          <span className="text-xs text-slate-600 tabular-nums font-semibold shrink-0 w-16 text-right">
+                            {country.count.toLocaleString()}
+                            <span className="text-[10px] text-slate-400 font-normal ml-1">works</span>
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </section>
+            )}
+
+            {/* ── Global Collaboration Hub ── */}
+            <section className="space-y-3">
+              <div className="flex items-center gap-2">
+                <h2 className="text-xs font-semibold tracking-[0.15em] uppercase text-slate-400">Global Research Collaboration Network</h2>
+                <div className="flex-1 h-px bg-slate-200" />
+              </div>
+              <div className="bg-white border border-slate-200 rounded-sm shadow-sm p-8 text-center flex flex-col items-center justify-center min-h-[200px]">
+                <Globe className="size-12 text-primary/20 mb-3" />
+                <h3 className="text-sm font-bold text-slate-700">Interactive Alliance Map</h3>
+                <p className="text-xs text-slate-500 mt-2 max-w-md mx-auto leading-relaxed" style={{ fontFamily: "'Open Sans', sans-serif" }}>
+                  Ashoka researchers actively collaborate with leading international institutions across multiple continents. Click on any global research node to discover connection strengths and cross-border partnerships.
+                </p>
+                <button 
+                  onClick={() => setShowNetworkMap(true)}
+                  className="mt-4 px-4 py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-xs font-semibold text-slate-600 rounded transition-colors"
+                >
+                  Explore Global Network
+                </button>
+              </div>
+            </section>
+          </div>
         )}
 
         {activeTab === "insights" && (
@@ -884,58 +976,102 @@ export function DashboardClient({
                 </div>
               </section>
             )}
-          </>
-        )}
 
-        {activeTab === "partnerships" && (
-          <>
-            {/* ── International Collaborations ── */}
-            {partnerCountries.length > 0 && (
+            {/* ── SUB-VIEW ORGANOGRAM ── */}
+            {insightsView === "organogram" && (
               <section className="space-y-3">
                 <div className="flex items-center gap-2">
-                  <h2 className="text-xs font-semibold tracking-[0.15em] uppercase text-slate-400">International Collaborations</h2>
+                  <h2 className="text-xs font-semibold tracking-[0.15em] uppercase text-slate-400">Academic Hierarchy Organogram</h2>
                   <div className="flex-1 h-px bg-slate-200" />
-                  <span className="text-[10px] text-slate-400">Source: OpenAlex co-authorships</span>
                 </div>
-                <div className="bg-white border border-slate-200 rounded-sm shadow-sm">
-                  <div className="px-5 pt-4 pb-3 border-b border-slate-100 flex items-center justify-between">
-                    <p className="text-xs text-slate-500">Countries with co-authored publications, ranked by volume</p>
-                    <span className="text-[10px] font-semibold text-slate-400 bg-slate-100 px-2 py-0.5 rounded">{partnerCountries.length} countries</span>
-                  </div>
-                  <div className="divide-y divide-slate-100">
-                    {partnerCountries.map((country: any, i: number) => {
-                      const maxCount = partnerCountries[0]?.count || 1;
-                      const pct = Math.round((country.count / maxCount) * 100);
-                      return (
-                        <div key={country.code} className="flex items-center gap-4 px-5 py-3 hover:bg-slate-50 transition-colors group">
-                          <span className="text-[10px] text-slate-400 w-5 tabular-nums font-medium shrink-0">{i + 1}</span>
-                          <span className="text-xs font-medium text-slate-700 w-36 shrink-0 truncate group-hover:text-slate-900 transition-colors flex items-center gap-2">
-                            <span className="text-sm leading-none">{country.code && country.code.length === 2 ? String.fromCodePoint(...[...country.code.toUpperCase()].map(c => 127397 + c.charCodeAt(0))) : ''}</span>
-                            {country.name}
-                          </span>
-                          <div className="flex-1 h-1.5 rounded-full bg-slate-100 overflow-hidden">
-                            <div
-                              className="h-full rounded-full bg-primary transition-all duration-300"
-                              style={{ width: `${pct}%` }}
-                            />
-                          </div>
-                          <span className="text-xs text-slate-600 tabular-nums font-semibold shrink-0 w-16 text-right">
-                            {country.count.toLocaleString()}
-                            <span className="text-[10px] text-slate-400 font-normal ml-1">works</span>
-                          </span>
+                <div className="bg-white border border-slate-200 rounded-sm shadow-sm p-10 text-center overflow-x-auto">
+                  <div className="min-w-[400px] flex flex-col items-center">
+                    
+                    {/* Level 1 */}
+                    <div className="flex flex-col items-center">
+                      <div className="size-12 bg-primary text-white rounded flex items-center justify-center shadow-sm relative z-10">
+                        <Building2 className="size-5" />
+                      </div>
+                      <span className="text-xs font-bold text-slate-700 mt-3">Vice Chancellor</span>
+                    </div>
+                    
+                    {/* Connector Line Down */}
+                    <div className="w-px h-6 bg-slate-300" />
+                    
+                    {/* Horizontal Connector Container */}
+                    <div className="w-[264px] h-px bg-slate-300" />
+                    
+                    {/* Level 2 */}
+                    <div className="flex justify-between w-[360px] relative">
+                      <div className="flex flex-col items-center -mt-px w-24">
+                        <div className="w-px h-6 bg-slate-300" />
+                        <div className="size-10 bg-slate-50 border border-slate-200 rounded flex items-center justify-center relative z-10">
+                          <Users className="size-4 text-slate-500" />
                         </div>
-                      );
-                    })}
+                        <span className="text-[10px] font-semibold text-slate-600 mt-2 text-center leading-tight">Dean of Research</span>
+                      </div>
+                      
+                      <div className="flex flex-col items-center -mt-px w-24">
+                        <div className="w-px h-6 bg-slate-300" />
+                        <div className="size-10 bg-slate-50 border border-slate-200 rounded flex items-center justify-center relative z-10">
+                          <BookOpen className="size-4 text-slate-500" />
+                        </div>
+                        <span className="text-[10px] font-semibold text-slate-600 mt-2 text-center leading-tight">Dean of Faculty</span>
+                      </div>
+                      
+                      <div className="flex flex-col items-center -mt-px w-24">
+                        <div className="w-px h-6 bg-slate-300" />
+                        <div className="size-10 bg-slate-50 border border-slate-200 rounded flex items-center justify-center relative z-10">
+                          <Award className="size-4 text-slate-500" />
+                        </div>
+                        <span className="text-[10px] font-semibold text-slate-600 mt-2 text-center leading-tight">Dean of Students</span>
+                      </div>
+                    </div>
+                    
                   </div>
+                  <p className="text-xs text-slate-500 mt-10 max-w-lg mx-auto leading-relaxed" style={{ fontFamily: "'Open Sans', sans-serif" }}>
+                    Explore the academic departments, divisions, and senior leadership of Ashoka University. Drill down from schools to departments to identify active researchers and deans.
+                  </p>
                 </div>
               </section>
             )}
-
-            {/* ── SDG Impact ── */}
-            <SDGGrid sdgs={sdgs} />
           </>
         )}
+
       </div>
+
+      {/* ── Interactive Network Map Modal ── */}
+      {showNetworkMap && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
+          <div className="bg-white rounded shadow-2xl w-full max-w-5xl h-[85vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-white z-10 shrink-0">
+              <div className="flex items-center gap-3">
+                <Globe className="size-6 text-primary" />
+                <h2 className="text-xl font-bold text-slate-900" style={{ fontFamily: "Georgia, serif" }}>Global Research Collaboration Network</h2>
+              </div>
+              <button 
+                onClick={() => setShowNetworkMap(false)} 
+                className="text-slate-400 hover:text-slate-700 bg-slate-50 hover:bg-slate-100 px-3 py-1.5 rounded text-sm font-semibold transition-colors"
+              >
+                Close Map
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto bg-slate-50/50 p-6 custom-scrollbar">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                {partnerCountries.map(c => (
+                  <div key={c.code} className="bg-white p-5 rounded-lg shadow-sm border border-slate-200/60 text-center flex flex-col items-center hover:border-primary/40 hover:shadow-md transition-all group">
+                    <span className="text-4xl mb-3 drop-shadow-sm group-hover:scale-110 transition-transform">
+                      {c.code && c.code.length === 2 ? String.fromCodePoint(...[...c.code.toUpperCase()].map(char => 127397 + char.charCodeAt(0))) : '🌐'}
+                    </span>
+                    <span className="font-bold text-slate-700 text-sm leading-tight mb-1">{c.name}</span>
+                    <span className="text-xs text-primary font-semibold bg-primary/5 px-2 py-0.5 rounded-full mt-auto">{c.count.toLocaleString()} works</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

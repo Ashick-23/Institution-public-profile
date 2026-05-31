@@ -36,11 +36,12 @@ export function SDGGrid({ sdgs }: { sdgs: { id: number; name: string; count: num
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
         {sdgs.map((sdg) => (
           <div key={sdg.id} className="bg-white border border-slate-200 rounded-sm shadow-sm flex items-start gap-4 p-4 hover:border-slate-300 transition-colors">
-            <div 
-              className="size-10 rounded text-white flex items-center justify-center font-bold text-sm shrink-0 shadow-sm"
-              style={{ backgroundColor: SDG_COLORS[sdg.id] || '#64748b' }}
-            >
-              {sdg.id}
+            <div className="size-12 rounded shrink-0 shadow-sm overflow-hidden flex items-center justify-center bg-slate-50 border border-slate-100">
+              <img 
+                src={`/sdgs/sdg-${sdg.id}.png`} 
+                alt={`SDG ${sdg.id}`} 
+                className="w-full h-full object-cover" 
+              />
             </div>
             <div className="min-w-0 flex-1">
               <h4 className="text-xs font-semibold text-slate-700 leading-tight mb-1">{sdg.name}</h4>
