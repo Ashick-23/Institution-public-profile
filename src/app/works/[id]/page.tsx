@@ -152,14 +152,6 @@ export default async function WorkPage({
                     <Unlock className="size-3" /> Free Full Text
                   </a>
                 )}
-                <a
-                  href={`https://openalex.org/${work.id?.split('/').pop()}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-700 transition-colors underline underline-offset-2"
-                >
-                  <ExternalLink className="size-3" /> OpenAlex
-                </a>
               </div>
             </div>
           </div>
@@ -356,11 +348,6 @@ export default async function WorkPage({
             </div>
           </section>
         )}
-
-        {/* ── Footer ── */}
-        <footer className="pt-4 border-t border-slate-200 text-[10px] text-slate-400 flex items-center justify-center">
-          <span>Data sourced from <a href="https://openalex.org" target="_blank" rel="noreferrer" className="underline hover:text-slate-600">OpenAlex</a> · CC0</span>
-        </footer>
 
       </main>
     </div>
