@@ -127,18 +127,10 @@ export default async function FacultyPage({
                       rel="noreferrer"
                       className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-medium bg-[#a6ce39]/10 text-[#5b7f1b] border border-[#a6ce39]/40 hover:bg-[#a6ce39]/20 transition-colors"
                     >
-                      <svg className="size-3" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.372 0 0 5.372 0 12s5.372 12 12 12 12-5.372 12-12S18.628 0 12 0zM7.369 4.378c.525 0 .947.431.947.947s-.422.947-.947.947-.947-.431-.947-.947.422-.947.947-.947zm-.722 3.038h1.444v10.041H6.647V7.416zm3.562 0h3.9c3.712 0 5.344 2.653 5.344 5.025 0 2.578-2.016 5.016-5.325 5.016h-3.919V7.416zm1.444 1.303v7.444h2.297c2.359 0 3.925-1.822 3.925-3.722 0-1.9-1.566-3.722-3.925-3.722h-2.297z"/></svg>
+                      <svg className="size-3" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.372 0 0 5.372 0 12s5.372 12 12 12 12-5.372 12-12S18.628 0 12 0zM7.369 4.378c.525 0 .947.431.947.947s-.422.947-.947.947-.947-.431-.947-.947.422-.947.947-.947zm-.722 3.038h1.444v10.041H6.647V7.416zm3.562 0h3.9c3.712 0 5.344 2.653 5.344 5.025 0 2.578-2.016 5.016-5.325 5.016h-3.919V7.416zm1.444 1.303v7.444h2.297c2.359 0 3.925-1.822 3.925-3.722 0-1.9-1.566-3.722-3.925-3.722h-2.297z" /></svg>
                       ORCID
                     </a>
                   )}
-                  <a
-                    href={`https://openalex.org/${author.id?.split('/').pop()}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-medium bg-slate-100 text-slate-600 border border-slate-200 hover:bg-slate-200 transition-colors"
-                  >
-                    <ExternalLink className="size-3" /> OpenAlex Profile
-                  </a>
                   {author.ids?.wikipedia && (
                     <a
                       href={author.ids.wikipedia}
@@ -318,11 +310,6 @@ export default async function FacultyPage({
             </div>
           </section>
         )}
-
-        {/* ── Footer ── */}
-        <footer className="pt-4 border-t border-slate-200 text-[10px] text-slate-400 flex items-center justify-center">
-          <span>Data sourced from <a href="https://openalex.org" target="_blank" rel="noreferrer" className="underline hover:text-slate-600">OpenAlex</a> · CC0</span>
-        </footer>
 
       </main>
     </div>
