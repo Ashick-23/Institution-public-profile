@@ -26,11 +26,11 @@ export function CountsYearChart({ data }: { data: any[] }) {
           </div>
           <div className="flex gap-4 text-xs font-medium">
             <div className="flex items-center gap-1.5 text-slate-600">
-              <div className="size-2 rounded-full bg-[#2e6da4]"></div>
+              <div className="size-2 rounded-full" style={{ backgroundColor: "#0d3862" }}></div>
               Publications
             </div>
             <div className="flex items-center gap-1.5 text-slate-600">
-              <div className="w-3 h-0.5 bg-[#f97316]"></div>
+              <div className="w-3 h-0.5" style={{ backgroundColor: "#c4122f" }}></div>
               Citations
             </div>
           </div>
@@ -41,8 +41,8 @@ export function CountsYearChart({ data }: { data: any[] }) {
               <ComposedChart data={data} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
                 <defs>
                   <linearGradient id="colorWorks" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#2e6da4" stopOpacity={0.2} />
-                    <stop offset="95%" stopColor="#2e6da4" stopOpacity={0} />
+                    <stop offset="5%" stopColor="#0d3862" stopOpacity={0.2} />
+                    <stop offset="95%" stopColor="#0d3862" stopOpacity={0} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="2 4" vertical={false} stroke="rgba(30,58,95,0.06)" />
@@ -72,7 +72,7 @@ export function CountsYearChart({ data }: { data: any[] }) {
                   orientation="right"
                   axisLine={false}
                   tickLine={false}
-                  tick={{ fontSize: 10, fill: '#f97316' }}
+                  tick={{ fontSize: 10, fill: '#c4122f' }}
                   tickFormatter={(val) => new Intl.NumberFormat("en-US", { notation: "compact" }).format(val)}
                   width={50}
                 />
@@ -98,20 +98,20 @@ export function CountsYearChart({ data }: { data: any[] }) {
                   yAxisId="left"
                   type="monotone"
                   dataKey="works_count"
-                  stroke="#1e3a5f"
+                  stroke="#0d3862"
                   strokeWidth={2}
                   fill="url(#colorWorks)"
-                  activeDot={{ r: 5, fill: '#1e3a5f', stroke: '#fff', strokeWidth: 2 }}
+                  activeDot={{ r: 5, fill: '#0d3862', stroke: '#fff', strokeWidth: 2 }}
                 />
                 
                 <Line
                   yAxisId="right"
                   type="monotone"
                   dataKey="cited_by_count"
-                  stroke="#f97316"
+                  stroke="#c4122f"
                   strokeWidth={2.5}
                   dot={false}
-                  activeDot={{ r: 5, fill: '#f97316', stroke: '#fff', strokeWidth: 2 }}
+                  activeDot={{ r: 5, fill: '#c4122f', stroke: '#fff', strokeWidth: 2 }}
                 />
               </ComposedChart>
             </ResponsiveContainer>

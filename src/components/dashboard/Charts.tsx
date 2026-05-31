@@ -13,14 +13,15 @@ import {
   Cell,
 } from "recharts";
 
+// Ashoka University brand palette — Blue-dominant (70% primary rule), Red as accent
 const ACADEMIC_COLORS = [
-  "#1e3a5f",
-  "#2e6da4",
-  "#3a7ebf",
-  "#4f9fd4",
-  "#6eb5e0",
-  "#8ecae6",
-  "#aad5ed",
+  "#0d3862", // Ashoka Blue – primary
+  "#1a5491", // Blue shade 2
+  "#2e6da4", // Blue shade 3
+  "#4a90c4", // Blue shade 4
+  "#6db3d9", // Blue shade 5
+  "#c4122f", // Ashoka Red – accent
+  "#8b0e21", // Red shade
 ];
 
 export function GrowthChart({ data }: { data: any[] }) {
